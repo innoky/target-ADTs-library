@@ -4,6 +4,7 @@
 #include "include/Muttable/List/ListMutableSequence.hpp"
 #include "include/Immutable/Array/ArrayImmutableSequence.hpp"
 #include "include/Immutable/List/ListImmutableSequence.hpp"
+#include "include/SpecializedADT/SegmentedDeque.hpp"
 
 #include "include/SpecializedADT/Queue.hpp"
 #include "include/SpecializedADT/Deque.hpp"
@@ -14,67 +15,54 @@ void TestArrayMutableSequence()
     int items[] = {1, 2, 3, 4, 5};
     ArrayMutableSequence<int> seq(items, 5);
 
-    // GetFirst / GetLast / Get
     assert(seq.GetFirst() == 1);
     assert(seq.GetLast() == 5);
     assert(seq.Get(2) == 3);
 
-    // AppendInPlace
     seq.AppendInPlace(6);
     assert(seq.GetLast() == 6);
     assert(seq.GetLength() == 6);
 
-    // PrependInPlace
     seq.PrependInPlace(0);
     assert(seq.GetFirst() == 0);
     assert(seq.GetLength() == 7);
 
-    // InsertAtInPlace
     seq.InsertAtInPlace(99, 3);
     assert(seq.Get(3) == 99);
     assert(seq.GetLength() == 8);
 
-    // RemoveAtInPlace (удаляем 3-й элемент)
     seq.RemoveAtInPlace(3);
     assert(seq.Get(3) != 99);
     assert(seq.GetLength() == 7);
 
-    // RemoveAtInPlace (удаляем первый элемент)
     seq.RemoveAtInPlace(0);
     assert(seq.GetFirst() == 1);
     assert(seq.GetLength() == 6);
 
-    // RemoveAtInPlace (удаляем последний элемент)
     seq.RemoveAtInPlace(seq.GetLength() - 1);
     assert(seq.GetLast() == 5);
     assert(seq.GetLength() == 5);
 
-    // operator[]
     seq[3] = 55;
     assert(seq[3] == 55);
 
-    // GetSubsequence
     auto subSeq = seq.GetSubsequence(2, 4);
     assert(subSeq->GetLength() == 3);
     assert(subSeq->Get(0) == seq.Get(2));
 
-    // ConcatInPlace
     ArrayMutableSequence<int> otherSeq(items, 5);
     seq.ConcatInPlace(&otherSeq);
     assert(seq.GetLength() == 10);
     assert(seq.GetLast() == 5);
 
-    // Map
     auto mapped = seq.Map([](const int &x)
                           { return x * 2; });
     assert(mapped->Get(0) == seq.Get(0) * 2);
 
-    // Reduce
     int sum = seq.Reduce([](const int &acc, const int &x)
                          { return acc + x; }, 0);
     assert(sum > 0);
 
-    // Where
     auto filtered = seq.Where([](const int &x)
                               { return x % 2 == 0; });
     for (int i = 0; i < filtered->GetLength(); ++i)
@@ -82,15 +70,13 @@ void TestArrayMutableSequence()
         assert(filtered->Get(i) % 2 == 0);
     }
 
-    // Zip
     auto zipped = seq.Zip(&otherSeq);
     assert(zipped->GetLength() == std::min(seq.GetLength(), otherSeq.GetLength()));
 
-    // Итерация
     int count = 0;
     for (auto &val : seq)
     {
-        (void)val; // просто пробежка
+        (void)val; 
         count++;
     }
     assert(count == seq.GetLength());
@@ -104,67 +90,54 @@ void TestListMutableSequence()
     int items[] = {1, 2, 3, 4, 5};
     ListMutableSequence<int> seq(items, 5);
 
-    // GetFirst / GetLast / Get
     assert(seq.GetFirst() == 1);
     assert(seq.GetLast() == 5);
     assert(seq.Get(2) == 3);
 
-    // AppendInPlace
     seq.AppendInPlace(6);
     assert(seq.GetLast() == 6);
     assert(seq.GetLength() == 6);
 
-    // PrependInPlace
     seq.PrependInPlace(0);
     assert(seq.GetFirst() == 0);
     assert(seq.GetLength() == 7);
 
-    // InsertAtInPlace
     seq.InsertAtInPlace(99, 3);
     assert(seq.Get(3) == 99);
     assert(seq.GetLength() == 8);
 
-    // RemoveAtInPlace (удаляем 3-й элемент)
     seq.RemoveAtInPlace(3);
     assert(seq.Get(3) != 99);
     assert(seq.GetLength() == 7);
 
-    // RemoveAtInPlace (удаляем первый элемент)
     seq.RemoveAtInPlace(0);
     assert(seq.GetFirst() == 1);
     assert(seq.GetLength() == 6);
 
-    // RemoveAtInPlace (удаляем последний элемент)
     seq.RemoveAtInPlace(seq.GetLength() - 1);
     assert(seq.GetLast() == 5);
     assert(seq.GetLength() == 5);
 
-    // operator[]
     seq[3] = 55;
     assert(seq[3] == 55);
 
-    // GetSubsequence
     auto subSeq = seq.GetSubsequence(2, 4);
     assert(subSeq->GetLength() == 3);
     assert(subSeq->Get(0) == seq.Get(2));
 
-    // ConcatInPlace
     ListMutableSequence<int> otherSeq(items, 5);
     seq.ConcatInPlace(&otherSeq);
     assert(seq.GetLength() == 10);
     assert(seq.GetLast() == 5);
 
-    // Map
     auto mapped = seq.Map([](const int &x)
                           { return x * 2; });
     assert(mapped->Get(0) == seq.Get(0) * 2);
 
-    // Reduce
     int sum = seq.Reduce([](const int &acc, const int &x)
                          { return acc + x; }, 0);
     assert(sum > 0);
 
-    // Where
     auto filtered = seq.Where([](const int &x)
                               { return x % 2 == 0; });
     for (int i = 0; i < filtered->GetLength(); ++i)
@@ -172,11 +145,9 @@ void TestListMutableSequence()
         assert(filtered->Get(i) % 2 == 0);
     }
 
-    // Zip
     auto zipped = seq.Zip(&otherSeq);
     assert(zipped->GetLength() == std::min(seq.GetLength(), otherSeq.GetLength()));
 
-    // Итерация
     int count = 0;
     for (auto &val : seq)
     {
@@ -194,48 +165,39 @@ void TestArrayImmutableSequence()
     int items[] = {1, 2, 3, 4, 5};
     ArrayImmutableSequence<int> seq(items, 5);
 
-    // GetFirst / GetLast / Get
     assert(seq.GetFirst() == 1);
     assert(seq.GetLast() == 5);
     assert(seq.Get(2) == 3);
 
-    // Append
     auto appended = seq.Append(6);
     assert(appended->GetLast() == 6);
     assert(appended->GetLength() == 6);
 
-    // Prepend
     auto prepended = seq.Prepend(0);
     assert(prepended->GetFirst() == 0);
     assert(prepended->GetLength() == 6);
 
-    // InsertAt
     auto inserted = seq.InsertAt(99, 3);
     assert(inserted->Get(3) == 99);
     assert(inserted->GetLength() == 6);
 
-    // GetSubsequence
     auto subSeq = seq.GetSubsequence(2, 4);
     assert(subSeq->GetLength() == 3);
     assert(subSeq->Get(0) == seq.Get(2));
 
-    // Concat
     ArrayImmutableSequence<int> otherSeq(items, 5);
     auto concatenated = seq.Concat(&otherSeq);
     assert(concatenated->GetLength() == 10);
     assert(concatenated->GetLast() == 5);
 
-    // Map
     auto mapped = seq.Map([](const int &x)
                           { return x * 2; });
     assert(mapped->Get(0) == seq.Get(0) * 2);
 
-    // Reduce
     int sum = seq.Reduce([](const int &acc, const int &x)
                          { return acc + x; }, 0);
     assert(sum > 0);
 
-    // Where
     auto filtered = seq.Where([](const int &x)
                               { return x % 2 == 0; });
     for (int i = 0; i < filtered->GetLength(); ++i)
@@ -243,7 +205,6 @@ void TestArrayImmutableSequence()
         assert(filtered->Get(i) % 2 == 0);
     }
 
-    // Zip
     auto zipped = seq.Zip(&otherSeq);
     assert(zipped->GetLength() == std::min(seq.GetLength(), otherSeq.GetLength()));
 
@@ -256,48 +217,39 @@ void TestListImmutableSequence()
     int items[] = {1, 2, 3, 4, 5};
     ListImmutableSequence<int> seq(items, 5);
 
-    // GetFirst / GetLast / Get
     assert(seq.GetFirst() == 1);
     assert(seq.GetLast() == 5);
     assert(seq.Get(2) == 3);
 
-    // Append
     auto appended = seq.Append(6);
     assert(appended->GetLast() == 6);
     assert(appended->GetLength() == 6);
 
-    // Prepend
     auto prepended = seq.Prepend(0);
     assert(prepended->GetFirst() == 0);
     assert(prepended->GetLength() == 6);
 
-    // InsertAt
     auto inserted = seq.InsertAt(99, 3);
     assert(inserted->Get(3) == 99);
     assert(inserted->GetLength() == 6);
 
-    // GetSubsequence
     auto subSeq = seq.GetSubsequence(2, 4);
     assert(subSeq->GetLength() == 3);
     assert(subSeq->Get(0) == seq.Get(2));
 
-    // Concat
     ListImmutableSequence<int> otherSeq(items, 5);
     auto concatenated = seq.Concat(&otherSeq);
     assert(concatenated->GetLength() == 10);
     assert(concatenated->GetLast() == 5);
 
-    // Map
     auto mapped = seq.Map([](const int &x)
                           { return x * 2; });
     assert(mapped->Get(0) == seq.Get(0) * 2);
 
-    // Reduce
     int sum = seq.Reduce([](const int &acc, const int &x)
                          { return acc + x; }, 0);
     assert(sum > 0);
 
-    // Where
     auto filtered = seq.Where([](const int &x)
                               { return x % 2 == 0; });
     for (int i = 0; i < filtered->GetLength(); ++i)
@@ -305,7 +257,6 @@ void TestListImmutableSequence()
         assert(filtered->Get(i) % 2 == 0);
     }
 
-    // Zip
     auto zipped = seq.Zip(&otherSeq);
     assert(zipped->GetLength() == std::min(seq.GetLength(), otherSeq.GetLength()));
 
@@ -317,18 +268,16 @@ void TestQueue()
     std::cout << "Testing Queue..." << std::endl;
     Queue<int> queue;
 
-    // Проверка пустой очереди
     assert(queue.IsEmpty());
     try
     {
         queue.Dequeue();
-        assert(false); // должно выбросить исключение
+        assert(false); 
     }
     catch (const std::out_of_range &)
     {
     }
 
-    // Enqueue / Dequeue
     queue.Enqueue(10);
     queue.Enqueue(20);
     queue.Enqueue(30);
@@ -354,12 +303,11 @@ void TestDeque()
     std::cout << "Testing Deque..." << std::endl;
     Deque<int> deque;
 
-    // Дек пустой — проверяем исключения
     assert(deque.IsEmpty());
     try
     {
         deque.PopFront();
-        assert(false); // должно выбросить
+        assert(false); 
     }
     catch (const std::out_of_range &)
     {
@@ -367,13 +315,12 @@ void TestDeque()
     try
     {
         deque.PopBack();
-        assert(false); // должно выбросить
+        assert(false); 
     }
     catch (const std::out_of_range &)
     {
     }
 
-    // PushBack + PopFront (имитируем очередь)
     deque.PushBack(1);
     deque.PushBack(2);
     deque.PushBack(3);
@@ -386,7 +333,6 @@ void TestDeque()
     assert(deque.PopFront() == 3);
     assert(deque.IsEmpty());
 
-    // PushFront + PopBack (имитируем стек)
     deque.PushFront(10);
     deque.PushFront(20);
     deque.PushFront(30);
@@ -399,7 +345,6 @@ void TestDeque()
     assert(deque.PopBack() == 30);
     assert(deque.IsEmpty());
 
-    // Комбинированные операции
     deque.PushBack(100);
     deque.PushFront(200);
     deque.PushBack(300);
@@ -412,7 +357,6 @@ void TestDeque()
     assert(deque.PopFront() == 100);
     assert(deque.IsEmpty());
 
-    // Проверим последовательность операций
     deque.PushBack(1);
     deque.PushBack(2);
     deque.PushBack(3);
@@ -422,7 +366,6 @@ void TestDeque()
     assert(deque.PeekFront() == -1);
     assert(deque.PeekBack() == 3);
 
-    // Полностью опустошаем
     assert(deque.PopFront() == -1);
     assert(deque.PopFront() == 0);
     assert(deque.PopFront() == 1);
@@ -433,6 +376,49 @@ void TestDeque()
     std::cout << "Deque tests passed!" << std::endl;
 }
 
+void TestSegmentedDeque()
+{
+    std::cout << "Testing SegmentedDeque..." << std::endl;
+
+    SegmentedDeque<std::string> deque;
+
+    assert(deque.GetLength() == 0);
+
+    deque.AppendInPlace("A");
+    deque.AppendInPlace("B");
+    deque.AppendInPlace("C");
+
+    assert(deque.GetLength() == 3);
+    assert(deque.GetFirst() == "A");
+    assert(deque.GetLast() == "C");
+    assert(deque.Get(1) == "B");
+
+    deque.PrependInPlace("Z");
+    assert(deque.GetLength() == 4);
+    assert(deque.GetFirst() == "Z");
+
+    deque.InsertAtInPlace("X", 2);
+    assert(deque.Get(2) == "X");
+    assert(deque.GetLength() == 5);
+
+    deque.RemoveAtInPlace(2); 
+    assert(deque.Get(2) != "X");
+    assert(deque.GetLength() == 4);
+
+    SegmentedDeque<std::string> other;
+    other.AppendInPlace("D");
+    other.AppendInPlace("E");
+
+    deque.ConcatInPlace(&other);
+    assert(deque.GetLength() == 6);
+    assert(deque.GetLast() == "E");
+
+    deque[3] = "Q";
+    assert(deque[3] == "Q");
+
+    std::cout << "SegmentedDeque tests passed!" << std::endl;
+}
+
 int main()
 {
     TestArrayMutableSequence();
@@ -441,6 +427,8 @@ int main()
     TestListImmutableSequence();
     TestQueue();
     TestDeque();
+    TestSegmentedDeque();
+    
     std::cout << "All tests passed successfully!" << std::endl;
     return 0;
 }
